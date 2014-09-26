@@ -18,7 +18,7 @@
  * Splash course format.  Display the whole course as a splash of columns.
  * 
  * @package format_splash
- * @copyright 2014
+ * @copyright 2014 T Orbasido with modifications to topics format 
  * @author t.orbasido@gmail.com
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
