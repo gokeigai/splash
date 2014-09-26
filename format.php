@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * splash course format.  Display the whole course as "splash" made of modules.
- *
+ * Splash course format.  Display the whole course as a splash of columns.
+ * 
  * @package format_splash
  * @copyright 2014
  * @author t.orbasido@gmail.com
