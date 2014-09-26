@@ -18,8 +18,8 @@
  * splash course format.  Display the whole course as "splash" made of modules.
  *
  * @package format_splash
- * @copyright 2006 The Open University
- * @author N.D.Freear@open.ac.uk, and others.
+ * @copyright 2014
+ * @author t.orbasido@gmail.com
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
