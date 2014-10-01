@@ -18,9 +18,8 @@
  * Renderer for outputting the splash course format.
  *
  * @package format_splash
- * @copyright 2012 Dan Poltawski
+ * @copyright 2014 T Orbasido with modifications to topics format
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since Moodle 2.3
  */
 
 
@@ -127,7 +126,7 @@ class format_splash_renderer extends format_section_renderer_base {
      * @param array $modnamesused (argument not used)
      */
     public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused) {
-        global $PAGE, $USER;
+        global $PAGE, $USER, $CFG;
 
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
@@ -146,7 +145,36 @@ class format_splash_renderer extends format_section_renderer_base {
         // Now the list of sections..
         echo $this->start_section_list();
 		
-		  echo html_writer::link(
+		//there zshould only be one real header file if uploaded
+		$header = $this->courseformat->get_marginal_image($context->id, 'header');
+
+		//style the background of the header
+		if($header){
+			$fs = get_file_storage();
+			$file = $fs->get_file($context->id, 'format_splash', 'header', $course->id, '/', $header);
+			$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+			echo "<style> #page-header{
+				 background:url(\"".$url."\") no-repeat;
+		    } </style>";
+		}
+		
+		//there zshould only be one real footer file if uploaded
+		$footer = $this->courseformat->get_marginal_image($context->id, 'footer');
+
+		//use content css to add the footer image
+		if($footer){
+			$fs = get_file_storage();
+			$file = $fs->get_file($context->id, 'format_splash', 'footer', $course->id, '/', $footer);
+			$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+			echo "<style> #page-footer:before {
+    			content: url(\"".$url."\");
+			} </style>";
+		}
+		
+		
+		/*
+		$urlpicedit = $this->output->pix_url('t/edit');
+	    echo html_writer::link(
 		  $this->courseformat->splash_moodle_url('editimage.php', array(
 			  'contextid' => $context->id,
 			  'userid' => $USER->id,
@@ -157,7 +185,7 @@ class format_splash_renderer extends format_section_renderer_base {
 			  'role' => 'img',
 			  'aria-label' => "Set header image")) . '&nbsp;' . "Set header image",
 		  array('title' => ""));
-
+		*/
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
             if ($section == 0) {
                 // 0-section is displayed a little different then the others

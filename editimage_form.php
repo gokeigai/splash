@@ -35,7 +35,8 @@ class splash_image_form extends moodleform {
         $instance = $this->_customdata;
 
         // Visible elements.
-		$mform->addElement('filemanager', 'imagefile', get_string('files'), null, array('subdirs'=>1, 'accepted_types'=>'*'));
+		//$mform->addElement('filepicker', 'imagefile', get_string('files'), null, array('subdirs'=>1, 'accepted_types'=>'*'));
+		$mform->addElement('filemanager', 'imagefile', get_string('files'), null, array('subdirs'=>0, 'accepted_types'=>'image', 'maxfiles' => 1));
 		
         $mform->addHelpButton('imagefile', 'imagefile', 'format_splash');
         $mform->addElement('selectyesno', 'deleteimage', get_string('deleteimage', 'format_splash'));

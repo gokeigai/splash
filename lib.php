@@ -27,6 +27,59 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot. '/course/format/lib.php');
 
 /**
+ * Serves any files associated with the format.
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
+ * @return bool
+ */
+function format_splash_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+
+    // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
+    if ($context->contextlevel != CONTEXT_COURSE) {
+        return false; 
+    }
+ 
+    // Make sure the filearea is one of those used by the plugin.
+    if ($filearea !== 'header' && $filearea !== 'footer') {
+        return false;
+    }
+ 
+    // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
+    require_login($course, true, $cm);
+ 
+    // Leave this line out if you set the itemid to null in make_pluginfile_url (set $itemid to 0 instead).
+    $itemid = array_shift($args); // The first item in the $args array.
+ 
+    // Use the itemid to retrieve any relevant data records and perform any security checks to see if the
+    // user really does have access to the file in question.
+ 
+    // Extract the filename / filepath from the $args array.
+    $filename = array_pop($args); // The last item in the $args array.
+    if (!$args) {
+        $filepath = '/'; // $args is empty => the path is '/'
+    } else {
+        $filepath = '/'.implode('/', $args).'/'; // $args contains elements of the filepath
+    }
+ 
+    // Retrieve the file from the Files API.
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, 'format_splash', $filearea, $itemid, $filepath, $filename);
+    if (!$file) {
+    	echo "fail";
+        return false; // The file does not exist.
+    }
+ 
+    // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering. 
+    send_stored_file($file, 86400, 0, $forcedownload, $options);
+}
+
+/**
  * Main class for the splash course format
  *
  * @package    format_splash
@@ -267,7 +320,28 @@ class format_splash extends format_base {
      * @return array array of references to the added form elements.
      */
     public function create_edit_form_elements(&$mform, $forsection = false) {
+    	global $CFG, $COURSE; 
+        
         $elements = parent::create_edit_form_elements($mform, $forsection);
+
+		$options = array(
+        	'maxfiles' => 1,
+        	'subdirs' => 0,
+        	'accepted_types' =>  'image'
+		);
+		
+		//kudos to https://moodle.org/mod/forum/discuss.php?d=255180
+		//added a filemanager to upload and store the header image	
+		$context = context_course::instance($COURSE->id);
+		
+		file_prepare_standard_filemanager($COURSE, 'headerimage',$options, $context, 'format_splash', 'header', $COURSE->id);
+		$elements[] = $mform->addElement('filemanager', 'headerimage_filemanager', 'Course Homepage Header', null, $options);
+		$mform->setDefault('headerimage_filemanager', $COURSE->headerimage_filemanager);
+		
+		file_prepare_standard_filemanager($COURSE, 'footerimage',$options, $context, 'format_splash', 'footer', $COURSE->id);
+		$elements[] = $mform->addElement('filemanager', 'footerimage_filemanager', 'Course Homepage Footer', null, $options);
+		$mform->setDefault('footerimage_filemanager', $COURSE->footerimage_filemanager);
+		
 
         // Increase the number of sections combo box values if the user has increased the number of sections
         // using the icon on the course page beyond course 'maxsections' or course 'maxsections' has been
@@ -302,7 +376,18 @@ class format_splash extends format_base {
      * @return bool whether there were any changes to the options values
      */
     public function update_course_format_options($data, $oldcourse = null) {
-        global $DB;
+        global $DB, $COURSE;
+		
+		$options = array(
+        	'maxfiles' => 1,
+        	'subdirs' => 0,
+        	'accepted_types' =>  'image'
+		);
+		
+		$context = context_course::instance($COURSE->id);
+		$data->headerimage_filemanager = file_postupdate_standard_filemanager($data, 'headerimage', $options, $context, 'format_splash', 'header', $COURSE->id);
+		$data->footerimage_filemanager = file_postupdate_standard_filemanager($data, 'footerimage', $options, $context, 'format_splash', 'footer', $COURSE->id);
+		
         if ($oldcourse !== null) {
             $data = (array)$data;
             $oldcourse = (array)$oldcourse;
@@ -325,10 +410,48 @@ class format_splash extends format_base {
                 }
             }
         }
+
         return $this->update_format_options($data);
     }
 	
+	/** 
+	 * Shortcut function to set up url to point to format folder
+	 * 
+	 * @param url file path in format folder
+	 * @param params parameters for the url
+	 * 
+	 * @return new formatted url
+	 */
 	public function splash_moodle_url($url, array $params = null) {
         return new moodle_url('/course/format/splash/' . $url, $params);
+    }
+	
+	/** 
+	 * Check if header is set by checking filearea. There should be only one file with 
+	 * file area header for each course. if exists get filename.
+	 *  
+	 * @param contextid contextid for the course we are in
+	 * 
+	 * @return false if doesn't exist and filename string if it does
+	 */
+	public function get_marginal_image($contextid, $marginal) {
+        global $DB, $COURSE;
+		$sql = "SELECT filename FROM mdl_files WHERE contextid = $contextid AND component LIKE 'format_splash' AND filearea LIKE '$marginal' AND itemid = $COURSE->id";
+		$rst = $DB->get_records_sql($sql);
+		$filename = '';
+		foreach($rst as $row){
+			//for some reason stored file fuctions create an extra row sometimes that points to an empty file 
+			//check that we don't ever get that particular one	
+			if($row->filename!="."){
+				$filename = $row->filename;
+				break;
+			}
+		}
+		if(!empty($filename)){
+			return $filename;
+		}
+		else {
+			return false;
+		}
     }
 }
