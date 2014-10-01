@@ -46,7 +46,7 @@ function format_splash_pluginfile($course, $cm, $context, $filearea, $args, $for
     }
  
     // Make sure the filearea is one of those used by the plugin.
-    if ($filearea !== 'header' && $filearea !== 'footer') {
+    if ($filearea !== 'header' && $filearea !== 'footer' && $filearea !== 'logo') {
         return false;
     }
  
@@ -71,7 +71,6 @@ function format_splash_pluginfile($course, $cm, $context, $filearea, $args, $for
     $fs = get_file_storage();
     $file = $fs->get_file($context->id, 'format_splash', $filearea, $itemid, $filepath, $filename);
     if (!$file) {
-    	echo "fail";
         return false; // The file does not exist.
     }
  
@@ -336,11 +335,19 @@ class format_splash extends format_base {
 		
 		file_prepare_standard_filemanager($COURSE, 'headerimage',$options, $context, 'format_splash', 'header', $COURSE->id);
 		$elements[] = $mform->addElement('filemanager', 'headerimage_filemanager', 'Course Homepage Header', null, $options);
+		$mform->addHelpButton('headerimage_filemanager', 'header', 'format_splash');
 		$mform->setDefault('headerimage_filemanager', $COURSE->headerimage_filemanager);
 		
 		file_prepare_standard_filemanager($COURSE, 'footerimage',$options, $context, 'format_splash', 'footer', $COURSE->id);
 		$elements[] = $mform->addElement('filemanager', 'footerimage_filemanager', 'Course Homepage Footer', null, $options);
+		$mform->addHelpButton('footerimage_filemanager', 'footer', 'format_splash');
 		$mform->setDefault('footerimage_filemanager', $COURSE->footerimage_filemanager);
+		
+		file_prepare_standard_filemanager($COURSE, 'logoimage',$options, $context, 'format_splash', 'logo', $COURSE->id);
+		$elements[] = $mform->addElement('filemanager', 'logoimage_filemanager', 'Course Homepage Logo', null, $options);
+		$mform->addHelpButton('logoimage_filemanager', 'logo', 'format_splash');
+		$mform->setDefault('logoimage_filemanager', $COURSE->logoimage_filemanager);
+		
 		
 
         // Increase the number of sections combo box values if the user has increased the number of sections
@@ -387,6 +394,7 @@ class format_splash extends format_base {
 		$context = context_course::instance($COURSE->id);
 		$data->headerimage_filemanager = file_postupdate_standard_filemanager($data, 'headerimage', $options, $context, 'format_splash', 'header', $COURSE->id);
 		$data->footerimage_filemanager = file_postupdate_standard_filemanager($data, 'footerimage', $options, $context, 'format_splash', 'footer', $COURSE->id);
+		$data->footerimage_filemanager = file_postupdate_standard_filemanager($data, 'logoimage', $options, $context, 'format_splash', 'logo', $COURSE->id);
 		
         if ($oldcourse !== null) {
             $data = (array)$data;

@@ -171,6 +171,26 @@ class format_splash_renderer extends format_section_renderer_base {
 			} </style>";
 		}
 		
+		//there zshould only be one real footer file if uploaded
+		$logo = $this->courseformat->get_marginal_image($context->id, 'logo');
+
+		//use content css to add the footer image
+		if($logo){
+			$fs = get_file_storage();
+			$file = $fs->get_file($context->id, 'format_splash', 'logo', $course->id, '/', $logo);
+			$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+			echo "<style> 
+				#page-header a * {
+	    			visibility:hidden;
+				} 
+				#page-header a {
+					display:block;
+	    			overflow:hidden;
+	    			background:url(\"".$url."\") no-repeat;
+				} 
+			</style>";
+		}
+		
 		
 		/*
 		$urlpicedit = $this->output->pix_url('t/edit');
