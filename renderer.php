@@ -145,9 +145,19 @@ class format_splash_renderer extends format_section_renderer_base {
         // Now the list of sections..
         echo $this->start_section_list();
 		
+		//adjust section width depending on how many sections there are
+		$section_width = doubleval(100/$course->numsections)."%";
+		echo $section_width;
+		echo "<style>
+			.course-content ul.splash li.section.main{
+    			width: $section_width;
+    			float: left;
+    		}
+    	</style>";
+		
 		//there zshould only be one real header file if uploaded
 		$header = $this->courseformat->get_marginal_image($context->id, 'header');
-
+		
 		//style the background of the header
 		if($header){
 			$fs = get_file_storage();
@@ -158,7 +168,7 @@ class format_splash_renderer extends format_section_renderer_base {
 		    } </style>";
 		}
 		
-		//there zshould only be one real footer file if uploaded
+		//there should only be one real footer file if uploaded
 		$footer = $this->courseformat->get_marginal_image($context->id, 'footer');
 
 		//use content css to add the footer image
@@ -171,7 +181,7 @@ class format_splash_renderer extends format_section_renderer_base {
 			} </style>";
 		}
 		
-		//there zshould only be one real footer file if uploaded
+		//there should only be one real footer file if uploaded
 		$logo = $this->courseformat->get_marginal_image($context->id, 'logo');
 
 		//use content css to add the footer image
@@ -179,18 +189,21 @@ class format_splash_renderer extends format_section_renderer_base {
 			$fs = get_file_storage();
 			$file = $fs->get_file($context->id, 'format_splash', 'logo', $course->id, '/', $logo);
 			$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+			$imageinfo = $file->get_imageinfo();
+			$width = $imageinfo['width']."px";
+			$height = $imageinfo['height']."px";
+			
 			echo "<style> 
-				#page-header a * {
-	    			visibility:hidden;
-				} 
-				#page-header a {
-					display:block;
-	    			overflow:hidden;
+				div#page-header h1 {
+	    			text-indent: 100%;
+	    			white-space: nowrap;
+	    			overflow: hidden;
+	    			width:$width;
+	    			height:$height;
 	    			background:url(\"".$url."\") no-repeat;
-				} 
+				}
 			</style>";
 		}
-		
 		
 		/*
 		$urlpicedit = $this->output->pix_url('t/edit');
@@ -265,16 +278,18 @@ class format_splash_renderer extends format_section_renderer_base {
 
             echo html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
 
-            // Increase number of sections.
-            $straddsection = get_string('increasesections', 'moodle');
-            $url = new moodle_url('/course/changenumsections.php',
-                array('courseid' => $course->id,
-                      'increase' => true,
-                      'sesskey' => sesskey()));
-            $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
-            echo html_writer::link($url, $icon.get_accesshide($straddsection), array('class' => 'increase-sections'));
+            // Increase number of sections. only if less than 5. design decision
+            if ($course->numsections < 5) {
+	            $straddsection = get_string('increasesections', 'moodle');
+	            $url = new moodle_url('/course/changenumsections.php',
+	                array('courseid' => $course->id,
+	                      'increase' => true,
+	                      'sesskey' => sesskey()));
+	            $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
+	            echo html_writer::link($url, $icon.get_accesshide($straddsection), array('class' => 'increase-sections'));
+			}
 
-            if ($course->numsections > 0) {
+            if ($course->numsections > 2) {
                 // Reduce number of sections sections.
                 $strremovesection = get_string('reducesections', 'moodle');
                 $url = new moodle_url('/course/changenumsections.php',

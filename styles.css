@@ -8,8 +8,23 @@
 .course-content ul.splash li.section .right img.icon { padding: 0 0 4px 0;}
 .course-content ul.splash li.section .left .section-handle img.icon { padding:0; vertical-align: baseline; }
 
-.section.main.clearfix{
-    width: 25%;
-    float: left;
+.course-content ul.splash{
+    overflow: hidden;
 }
+
+.course-content ul.splash li.section.main{
+    height: 400px;
+    background: none;  
+}
+
+
+.course-content ul.splash li.section.main .sectionname{
+    table-layout: fixed;
+    word-wrap: break-word;
+    font-size: 15px;
+    margin-right:0px;
+}
+
+
+
 

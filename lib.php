@@ -265,12 +265,14 @@ class format_splash extends format_base {
         }
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
             $courseconfig = get_config('moodlecourse');
-            $max = $courseconfig->maxsections;
+            //max 5 sections for format to look ok
+            $max = 5;
             if (!isset($max) || !is_numeric($max)) {
                 $max = 52;
             }
             $sectionmenu = array();
-            for ($i = 0; $i <= $max; $i++) {
+			//min 2 sections
+            for ($i = 2; $i <= $max; $i++) {
                 $sectionmenu[$i] = "$i";
             }
             $courseformatoptionsedit = array(
@@ -334,17 +336,17 @@ class format_splash extends format_base {
 		$context = context_course::instance($COURSE->id);
 		
 		file_prepare_standard_filemanager($COURSE, 'headerimage',$options, $context, 'format_splash', 'header', $COURSE->id);
-		$elements[] = $mform->addElement('filemanager', 'headerimage_filemanager', 'Course Homepage Header', null, $options);
+		array_push( $elements, $mform->addElement('filemanager', 'headerimage_filemanager', 'Course Homepage Header', null, $options));
 		$mform->addHelpButton('headerimage_filemanager', 'header', 'format_splash');
 		$mform->setDefault('headerimage_filemanager', $COURSE->headerimage_filemanager);
 		
 		file_prepare_standard_filemanager($COURSE, 'footerimage',$options, $context, 'format_splash', 'footer', $COURSE->id);
-		$elements[] = $mform->addElement('filemanager', 'footerimage_filemanager', 'Course Homepage Footer', null, $options);
+		array_push( $elements,$mform->addElement('filemanager', 'footerimage_filemanager', 'Course Homepage Footer', null, $options));
 		$mform->addHelpButton('footerimage_filemanager', 'footer', 'format_splash');
 		$mform->setDefault('footerimage_filemanager', $COURSE->footerimage_filemanager);
 		
 		file_prepare_standard_filemanager($COURSE, 'logoimage',$options, $context, 'format_splash', 'logo', $COURSE->id);
-		$elements[] = $mform->addElement('filemanager', 'logoimage_filemanager', 'Course Homepage Logo', null, $options);
+		array_push( $elements,$mform->addElement('filemanager', 'logoimage_filemanager', 'Course Homepage Logo', null, $options));
 		$mform->addHelpButton('logoimage_filemanager', 'logo', 'format_splash');
 		$mform->setDefault('logoimage_filemanager', $COURSE->logoimage_filemanager);
 		
@@ -392,10 +394,21 @@ class format_splash extends format_base {
 		);
 		
 		$context = context_course::instance($COURSE->id);
-		$data->headerimage_filemanager = file_postupdate_standard_filemanager($data, 'headerimage', $options, $context, 'format_splash', 'header', $COURSE->id);
-		$data->footerimage_filemanager = file_postupdate_standard_filemanager($data, 'footerimage', $options, $context, 'format_splash', 'footer', $COURSE->id);
-		$data->footerimage_filemanager = file_postupdate_standard_filemanager($data, 'logoimage', $options, $context, 'format_splash', 'logo', $COURSE->id);
 		
+		$filemanagers = array(
+			'headerimage_filemanager' => 'header',
+			'footerimage_filemanager'=> 'footer',
+			'logoimage_filemanager' => 'logo'
+		);
+		
+		//check for filemanagers in $data
+		foreach ($filemanagers as $key => $value){
+			if(array_key_exists($key, $data)){
+				$img = $filemanagers[$key]."image";
+				$data->{$key} = file_postupdate_standard_filemanager($data, $img, $options, $context, 'format_splash', $filemanagers[$key], $COURSE->id);	
+			}
+		}
+
         if ($oldcourse !== null) {
             $data = (array)$data;
             $oldcourse = (array)$oldcourse;
@@ -418,7 +431,7 @@ class format_splash extends format_base {
                 }
             }
         }
-
+		
         return $this->update_format_options($data);
     }
 	
