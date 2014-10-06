@@ -13,10 +13,8 @@
 }
 
 .course-content ul.splash li.section.main{
-    height: 400px;
-    background: none;  
+    background: none; 
 }
-
 
 .course-content ul.splash li.section.main .sectionname{
     table-layout: fixed;
@@ -24,6 +22,26 @@
     font-size: 15px;
     margin-right:0px;
 }
+
+.course-content ul.splash li.section.main .content{
+	margin:0 10px;
+	overflow: auto;
+}
+
+.course-content ul.splash li.section.main .summary{
+	overflow: auto;
+}
+.right.side, .left.side{
+	display:none;
+}
+
+.editing .right.side, .editing .left.side{
+	display:inline;
+}
+.editing .course-content ul.splash li.section.main .content{
+	width:80%;
+}
+
 
 
 

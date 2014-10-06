@@ -73,6 +73,73 @@ class format_splash_renderer extends format_section_renderer_base {
     }
 
     /**
+     * Generate the display of the header part of a section before
+     * course modules are included
+     *
+     * @param stdClass $section The course_section entry from DB
+     * @param stdClass $course The course entry from DB
+     * @param bool $onsectionpage true if being printed on a single-section page
+     * @param int $sectionreturn The section to return to after an action
+     * @return string HTML to output.
+     */
+    protected function section_header($section, $course, $onsectionpage, $sectionreturn=null) {
+        global $PAGE;
+
+        $o = '';
+        $currenttext = '';
+        $sectionstyle = '';
+
+        if ($section->section != 0) {
+            // Only in the non-general sections.
+            if (!$section->visible) {
+                $sectionstyle = ' hidden';
+            } else if (course_get_format($course)->is_section_current($section)) {
+                $sectionstyle = ' current';
+            }
+        }
+
+        $o.= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
+            'class' => 'section main clearfix'.$sectionstyle, 'role'=>'region',
+            'aria-label'=> get_section_name($course, $section)));
+
+        $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
+        $o.= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
+
+        $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
+        $o.= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
+        $o.= html_writer::start_tag('div', array('class' => 'content'));
+
+        // When not on a section page, we display the section titles except the general section if null
+        $hasnamenotsecpg = (!$onsectionpage && ($section->section != 0 || !is_null($section->name)));
+
+        // When on a section page, we only display the general section title, if title is not the default one
+        $hasnamesecpg = ($onsectionpage && ($section->section == 0 && !is_null($section->name)));
+
+        $classes = ' accesshide';
+        if ($hasnamenotsecpg || $hasnamesecpg) {
+            $classes = '';
+        }
+        $o.= $this->output->heading($this->section_title($section, $course), 3, 'sectionname' . $classes);
+        $context = context_course::instance($course->id);
+        if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
+            $url = new moodle_url('/course/editsection.php', array('id'=>$section->id, 'sr'=>$sectionreturn));
+            $o.= html_writer::link($url,
+                html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/settings'),
+                    'class' => 'iconsmall edit', 'alt' => get_string('edit'))),
+                array('title' => get_string('editsummary')));
+        }
+        $o.= html_writer::start_tag('div', array('class' => 'summary'));
+        $o.= $this->format_summary_text($section);
+
+        $o.= html_writer::end_tag('div');
+
+        $o .= $this->section_availability_message($section,
+                has_capability('moodle/course:viewhiddensections', $context));
+
+        return $o;
+    }
+
+    /**
      * Generate the edit controls of a section
      *
      * @param stdClass $course The course entry from DB
@@ -147,7 +214,6 @@ class format_splash_renderer extends format_section_renderer_base {
 		
 		//adjust section width depending on how many sections there are
 		$section_width = doubleval(100/$course->numsections)."%";
-		echo $section_width;
 		echo "<style>
 			.course-content ul.splash li.section.main{
     			width: $section_width;
@@ -184,7 +250,7 @@ class format_splash_renderer extends format_section_renderer_base {
 		//there should only be one real footer file if uploaded
 		$logo = $this->courseformat->get_marginal_image($context->id, 'logo');
 
-		//use content css to add the footer image
+		//use content css to add the logo to replace the header
 		if($logo){
 			$fs = get_file_storage();
 			$file = $fs->get_file($context->id, 'format_splash', 'logo', $course->id, '/', $logo);
@@ -201,33 +267,26 @@ class format_splash_renderer extends format_section_renderer_base {
 	    			width:$width;
 	    			height:$height;
 	    			background:url(\"".$url."\") no-repeat;
+	    			margin:0;
+	    			padding:0;
+	    			top:0px;
+				}
+				div#page-header{
+					height:$height;
 				}
 			</style>";
 		}
 		
-		/*
-		$urlpicedit = $this->output->pix_url('t/edit');
-	    echo html_writer::link(
-		  $this->courseformat->splash_moodle_url('editimage.php', array(
-			  'contextid' => $context->id,
-			  'userid' => $USER->id,
-			  'role' => 'link',
-			  'aria-label' => "header")), html_writer::empty_tag('img', array(
-			  'src' => "",
-			  'alt' => "",
-			  'role' => 'img',
-			  'aria-label' => "Set header image")) . '&nbsp;' . "Set header image",
-		  array('title' => ""));
-		*/
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
             if ($section == 0) {
+            	/* //comment out section 0 for now
                 // 0-section is displayed a little different then the others
                 if ($thissection->summary or !empty($modinfo->sections[0]) or $PAGE->user_is_editing()) {
                     echo $this->section_header($thissection, $course, false, 0);
                     echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
                     echo $this->courserenderer->course_section_add_cm_control($course, 0, 0);
                     echo $this->section_footer();
-                }
+                }*/
                 continue;
             }
             if ($section > $course->numsections) {
