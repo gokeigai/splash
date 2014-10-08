@@ -1,48 +1,48 @@
-.course-content ul.splash {margin:0;}
-.course-content ul.splash li.section {list-style: none;margin:0 0 5px 0;padding:0;}
-.course-content ul.splash li.section .content {margin:0 40px;}
-.course-content ul.splash li.section .left {float:left;}
-.course-content ul.splash li.section .right {float:right;}
-.course-content ul.splash li.section .left,
-.course-content ul.splash li.section .right {width:40px;text-align:center;padding: 6px 0;}
-.course-content ul.splash li.section .right img.icon { padding: 0 0 4px 0;}
-.course-content ul.splash li.section .left .section-handle img.icon { padding:0; vertical-align: baseline; }
-
-.course-content ul.splash{
-    overflow: hidden;
-}
-
-.course-content ul.splash li.section.main{
-    background: none; 
-}
-
-.course-content ul.splash li.section.main .sectionname{
-    table-layout: fixed;
-    word-wrap: break-word;
-    font-size: 15px;
-    margin-right:0px;
-}
-
-.course-content ul.splash li.section.main .content{
-	margin:0 10px;
-	overflow: auto;
-}
-
-.course-content ul.splash li.section.main .summary{
-	overflow: auto;
-}
-.right.side, .left.side{
-	display:none;
-}
-
-.editing .right.side, .editing .left.side{
-	display:inline;
-}
-.editing .course-content ul.splash li.section.main .content{
-	width:80%;
-}
-
-
-
-
-
+.course-content ul.splash {margin:0;}
+.course-content ul.splash li.section {list-style: none;margin:0 0 5px 0;padding:0;}
+.course-content ul.splash li.section .content {margin:0 40px;}
+.course-content ul.splash li.section .left {float:left;}
+.course-content ul.splash li.section .right {float:right;}
+.course-content ul.splash li.section .left,
+.course-content ul.splash li.section .right {width:40px;text-align:center;padding: 6px 0;}
+.course-content ul.splash li.section .right img.icon { padding: 0 0 4px 0;}
+.course-content ul.splash li.section .left .section-handle img.icon { padding:0; vertical-align: baseline; }
+
+.course-content ul.splash{
+    overflow: hidden;
+}
+
+.course-content ul.splash li.section.main{
+    background: none; 
+}
+
+.course-content ul.splash li.section.main .sectionname{
+    table-layout: fixed;
+    word-wrap: break-word;
+    font-size: 15px;
+    margin-right:0px;
+}
+
+.course-content ul.splash li.section.main .content{
+	margin:0 10px;
+	overflow: auto;
+}
+
+.course-content ul.splash li.section.main .summary{
+	overflow: auto;
+}
+.right.side, .left.side{
+	display:none;
+}
+
+.editing .right.side, .editing .left.side{
+	display:inline;
+}
+.editing .course-content ul.splash li.section.main .content{
+	width:80%;
+}
+
+
+
+
+
