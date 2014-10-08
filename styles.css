@@ -20,14 +20,13 @@
     table-layout: fixed;
     word-wrap: break-word;
     font-size: 15px;
-    margin-right:0px;
+    margin-right:0px;        width: inherit;        height: 200px;        text-align: center;      	border: solid 1px;  	  	border-radius: 10px;    
 }
 
 .course-content ul.splash li.section.main .content{
 	margin:0 10px;
 	overflow: auto;
-}
-
+}
 .course-content ul.splash li.section.main .summary{
 	overflow: auto;
 }
@@ -40,7 +39,7 @@
 }
 .editing .course-content ul.splash li.section.main .content{
 	width:80%;
-}
+}
 
 
 

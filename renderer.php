@@ -552,10 +552,29 @@ class format_splash_renderer extends format_section_renderer_base {
 			</style>";
 
 		}
-
 		
 
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
+		
+	        //there should only be one real footer file if uploaded
+			$sec_image = $this->courseformat->get_section_image($context->id, $thissection->id);
+
+			//use css to add the section image	
+			if($sec_image){
+	
+				$fs = get_file_storage();
+	
+				$file = $fs->get_file($context->id, 'format_splash', 'section', $thissection->id, '/', $sec_image);
+	
+				$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+	
+				echo "<style>
+					.course-content ul.splash li#section-".$section." .sectionname{
+						background:url(\"".$url."\") no-repeat;
+					} 
+				 </style>";
+	
+			}
 
             if ($section == 0) {
 

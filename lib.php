@@ -1054,7 +1054,7 @@ class format_splash extends format_base {
 
 	 * @param contextid contextid for the course we are in
 
-	 * 
+	 * @param marginal string will be either header or footer
 
 	 * @return false if doesn't exist and filename string if it does
 
@@ -1065,6 +1065,58 @@ class format_splash extends format_base {
         global $DB, $COURSE;
 
 		$sql = "SELECT filename FROM mdl_files WHERE contextid = $contextid AND component LIKE 'format_splash' AND filearea LIKE '$marginal' AND itemid = $COURSE->id";
+
+		$rst = $DB->get_records_sql($sql);
+
+		$filename = '';
+
+		foreach($rst as $row){
+
+			//for some reason stored file fuctions create an extra row sometimes that points to an empty file 
+
+			//check that we don't ever get that particular one	
+
+			if($row->filename!="."){
+
+				$filename = $row->filename;
+
+				break;
+
+			}
+
+		}
+
+		if(!empty($filename)){
+
+			return $filename;
+
+		}
+
+		else {
+			return false;
+		}
+
+    }
+
+	/** 
+
+	 * Check if section has a icon/image
+
+	 *  
+
+	 * @param contextid contextid for the course we are in
+
+	 * 
+
+	 * @return false if doesn't exist and filename string if it does
+
+	 */
+
+	public function get_section_image($contextid, $sectionid) {
+
+        global $DB;
+
+		$sql = "SELECT filename FROM mdl_files WHERE contextid = $contextid AND component LIKE 'format_splash' AND filearea LIKE 'section' AND itemid = $sectionid";
 
 		$rst = $DB->get_records_sql($sql);
 
