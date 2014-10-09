@@ -617,6 +617,15 @@ class format_splash extends format_base {
                     'type' => PARAM_INT,
 
                 ),
+                
+				//jacky look at this
+                'slidertoggle' => array(
+
+                    'default' => 1,
+
+                    'type' => PARAM_INT,
+
+                ),
 
             );
 
@@ -675,6 +684,28 @@ class format_splash extends format_base {
                             0 => new lang_string('hiddensectionscollapsed'),
 
                             1 => new lang_string('hiddensectionsinvisible')
+
+                        )
+
+                    ),
+
+                ),
+                
+				//Jacky look at this
+                
+                'slidertoggle' => array(
+
+                    'label' => 'Slider Toggle',
+
+                    'element_type' => 'select',
+
+                    'element_attributes' => array(
+
+                        array(
+
+                            0 => 'Disable',
+
+                            1 => 'Enable'
 
                         )
 

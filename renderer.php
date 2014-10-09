@@ -423,23 +423,39 @@ class format_splash_renderer extends format_section_renderer_base {
 
         echo $this->start_section_list();
 
-		
-
 		//adjust section width depending on how many sections there are
 
 		$section_width = doubleval(100/$course->numsections)."%";
+		//Jacky look here
+		if (!$PAGE->user_is_editing()){
 
-		echo "<style>
-
-			.course-content ul.splash li.section.main{
-
-    			width: $section_width;
-
-    			float: left;
-
-    		}
-
-    	</style>";
+			echo "
+			<style>
+				@media (min-width: 600px){
+					.course-content ul.splash li.section.main{
+		
+		    			width: $section_width;
+		
+		    			float: left;
+		
+		    		}
+	    		}
+	
+	    	</style>";
+			
+			//for ie8 and under
+			echo "<!--[if lt IE 9]>
+					<style>
+						.course-content ul.splash li.section.main{
+			
+			    			width: $section_width;
+			
+			    			float: left;
+			
+			    		}
+			    	</style>
+				<![endif]-->";
+		}
 
 		
 
